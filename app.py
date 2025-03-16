@@ -1,20 +1,29 @@
+import os
 from flask import Flask
 from flasgger import Swagger
-from heroes import heroes_bp
-from adventures import adventures_bp
+from dotenv import load_dotenv
+from heroes.routes import heroes_bp
+from flask_sqlalchemy import SQLAlchemy
+
+load_dotenv()
 
 app = Flask(__name__)
 
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
 swagger = Swagger(app, template_file='swagger.yml')
 
-# Register Blueprints on specific URL prefixes
 app.register_blueprint(heroes_bp, url_prefix='/hero')
-app.register_blueprint(adventures_bp, url_prefix='/adventure')
+
 
 @app.route('/')
 def welcome():
     """
-    Welcome endpoint for "DevOps Chronicles" — where deployments misbehave.
+    Welcome endpoint for "DevOps Chronicles".
     """
     return """
     <h1>Welcome to The DevOps Chronicles</h1>
@@ -31,6 +40,8 @@ def welcome():
     """
 
 if __name__ == '__main__':
+    with app.app_context():
+      db.create_all()
     # For development, run with debug=True.
     # In production, run with Gunicorn (example):
     #   gunicorn app:app --workers 4
