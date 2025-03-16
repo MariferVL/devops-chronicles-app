@@ -2,7 +2,9 @@ import os
 from flask import Flask
 from flasgger import Swagger
 from dotenv import load_dotenv
+from extensions import db
 from heroes.routes import heroes_bp
+from adventures.routes import adventures_bp
 from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
@@ -13,12 +15,12 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 swagger = Swagger(app, template_file='swagger.yml')
 
 app.register_blueprint(heroes_bp, url_prefix='/hero')
-
+app.register_blueprint(adventures_bp, url_prefix='/adventure')
 
 @app.route('/')
 def welcome():
