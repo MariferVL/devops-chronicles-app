@@ -20,8 +20,8 @@ migrate = Migrate(app, db)
 
 swagger = Swagger(app, template_file='swagger.yml')
 
-app.register_blueprint(heroes_bp, url_prefix='/hero')
-app.register_blueprint(adventures_bp, url_prefix='/adventure')
+app.register_blueprint(heroes_bp, url_prefix='/heroes')
+app.register_blueprint(adventures_bp, url_prefix='/adventures')
 
 @app.route('/')
 def welcome():

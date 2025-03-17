@@ -35,7 +35,7 @@ def create_hero():
     
     return jsonify(new_hero.to_dict()), 201
 
-@heroes_bp.route('/heroes', methods=['GET'])
+@heroes_bp.route('/', methods=['GET'])
 def get_heroes():
     """
     Retrieve details of all heroes.
