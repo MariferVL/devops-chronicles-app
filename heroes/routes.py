@@ -24,16 +24,30 @@ def create_hero():
     new_hero = Hero(
         name=data['name'],
         role=data['role'],
-        health=100,  # Valor inicial
-        automation=50,  # Valor inicial
-        experience=0,  # Valor inicial
-        integrity=50  # Valor inicial
+        health=100, 
+        automation=50,  
+        experience=0,  
+        integrity=50  
     )
     
     db.session.add(new_hero)
     db.session.commit()
     
     return jsonify(new_hero.to_dict()), 201
+
+@heroes_bp.route('/heroes', methods=['GET'])
+def get_heroes():
+    """
+    Retrieve details of all heroes.
+    
+    Returns a list of all heroes in the database.
+    """
+    heroes = Hero.query.all()  
+    if not heroes:
+        return jsonify({'message': 'No heroes found'}), 404
+    
+    heroes_list = [hero.to_dict() for hero in heroes]
+    return jsonify(heroes_list)
 
 @heroes_bp.route('/<int:hero_id>', methods=['GET'])
 def get_hero(hero_id):

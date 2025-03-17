@@ -5,17 +5,18 @@ from dotenv import load_dotenv
 from extensions import db
 from heroes.routes import heroes_bp
 from adventures.routes import adventures_bp
-from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 load_dotenv()
 
 app = Flask(__name__)
 
-
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+migrate = Migrate(app, db)
 
 swagger = Swagger(app, template_file='swagger.yml')
 
@@ -43,6 +44,8 @@ def welcome():
 
 if __name__ == '__main__':
     with app.app_context():
+      from heroes.models import Hero  
+      from adventures.models import Adventure 
       db.create_all()
     # For development, run with debug=True.
     # In production, run with Gunicorn (example):
