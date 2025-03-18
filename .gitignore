@@ -23,8 +23,10 @@ docker-compose.override.yml
 *.terraform/
 crash.log
 *.tfvars
+tf_plan.out
 
-# AWS credentials (don't commit your keys)
+
+# AWS credentials 
 *.pem
 *.key
 
@@ -38,3 +40,5 @@ Thumbs.db
 
 # SwaggerHub
 swagger.yml
+
+.env

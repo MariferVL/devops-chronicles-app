@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
+from app.adventures.models import Adventure
+from app.heroes.models import Hero
+from app.extensions import db  
 import random
-from heroes import heroes  # Import our in-memory heroes list
 
 adventures_bp = Blueprint('adventures', __name__)
-
-# Global in-memory list to store adventure logs
-adventures = []
 
 # Predefined challenges for our DevOps world
 challenge_pool = [
@@ -22,7 +21,6 @@ challenge_pool = [
     "Kubernetes podocalypse",
     "Microservices orchestration mayhem"
 ]
-
 
 @adventures_bp.route('/', methods=['POST'])
 def create_adventure():
@@ -43,15 +41,16 @@ def create_adventure():
         return jsonify({'error': 'Missing required field: hero_id'}), 400
     
     hero_id = data['hero_id']
-    # Verify hero exists
-    if hero_id < 0 or hero_id >= len(heroes):
+    # Verify that the hero exists
+    hero = Hero.query.get(hero_id)
+    if not hero:
         return jsonify({'error': 'Hero not found'}), 404
     
     challenge = data.get('challenge')
     if not challenge:
         challenge = random.choice(challenge_pool)
         
-    # Determine outcome based on a random chance
+    # Determine the outcome based on a random probability
     outcome_roll = random.randint(1, 100)
     
     if outcome_roll > 70:
@@ -64,33 +63,39 @@ def create_adventure():
         result = "Defeat! The hero's code integrity was compromised by chaos."
         exp_gain = 0
     
-    adventure_record = {
-        "id": len(adventures),
-        "hero_id": hero_id,
-        "challenge": challenge,
-        "result": result,
-        "experience_gain": exp_gain
-    }
-    adventures.append(adventure_record)
+    # Create a record of the adventure
+    new_adventure = Adventure(
+        hero_id=hero_id,
+        challenge=challenge,
+        result=result,
+        experience_gain=exp_gain
+    )
+    
+    # Save to the database
+    db.session.add(new_adventure)
+    db.session.commit()
     
     # Update the hero's experience if necessary
     if exp_gain > 0:
-        heroes[hero_id]['experience'] += exp_gain
-    
-    return jsonify(adventure_record), 201
+        hero.experience += exp_gain
+        db.session.commit()
+
+    return jsonify(new_adventure.to_dict()), 201
 
 @adventures_bp.route('/<int:adventure_id>', methods=['GET'])
 def get_adventure(adventure_id):
     """
     Retrieve details of a specific adventure by its ID.
     """
-    if adventure_id < 0 or adventure_id >= len(adventures):
+    adventure = Adventure.query.get(adventure_id)
+    if not adventure:
         return jsonify({'error': 'Adventure not found'}), 404
-    return jsonify(adventures[adventure_id])
+    return jsonify(adventure.to_dict())
 
 @adventures_bp.route('/history', methods=['GET'])
 def get_adventure_history():
     """
     Retrieve a history of all adventures.
     """
-    return jsonify(adventures)
+    adventures = Adventure.query.all()
+    return jsonify([adventure.to_dict() for adventure in adventures])
