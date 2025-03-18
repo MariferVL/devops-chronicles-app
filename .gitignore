@@ -24,7 +24,7 @@ docker-compose.override.yml
 crash.log
 *.tfvars
 
-# AWS credentials (don't commit your keys)
+# AWS credentials 
 *.pem
 *.key
 
