@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from heroes.models import Hero
-from extensions import db 
+from app.heroes.models import Hero
+from app.extensions import db 
 
 heroes_bp = Blueprint('heroes', __name__)
 

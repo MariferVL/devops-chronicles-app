@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from adventures.models import Adventure
-from heroes.models import Hero
-from extensions import db  
+from app.adventures.models import Adventure
+from app.heroes.models import Hero
+from app.extensions import db  
 import random
 
 adventures_bp = Blueprint('adventures', __name__)
