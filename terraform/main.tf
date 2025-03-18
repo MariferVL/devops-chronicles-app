@@ -58,7 +58,7 @@ resource "aws_db_instance" "devops_rds" {
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = "db.t3.micro"
-  name                   = var.db_name
+  db_name                   = var.db_name
   username               = var.db_user
   password               = var.db_pass
   parameter_group_name   = "default.mysql8.0"
@@ -70,7 +70,7 @@ resource "aws_db_instance" "devops_rds" {
 
 resource "aws_key_pair" "devops_key" {
   key_name   = "devops-key"
-  public_key = var.pub_key
+  public_key = file(var.pub_key)
 }
 
 resource "aws_instance" "devops_instance" {
@@ -79,7 +79,12 @@ resource "aws_instance" "devops_instance" {
   key_name               = aws_key_pair.devops_key.key_name
   security_groups        = [aws_security_group.devops_sg.name]
 
-  user_data = file("init.sh")
+  user_data = templatefile("${path.module}/init.sh.tpl", {
+    db_user = var.db_user
+    db_pass = var.db_pass
+    db_name = var.db_name
+    db_host = aws_db_instance.devops_rds.address
+  })
 
   tags = {
     Name = "DevOpsChroniclesInstance"
