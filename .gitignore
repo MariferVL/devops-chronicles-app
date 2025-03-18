@@ -23,6 +23,8 @@ docker-compose.override.yml
 *.terraform/
 crash.log
 *.tfvars
+tf_plan.out
+
 
 # AWS credentials 
 *.pem
