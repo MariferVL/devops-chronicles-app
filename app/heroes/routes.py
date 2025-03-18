@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from heroes.models import Hero
-from extensions import db 
+from app.heroes.models import Hero
+from app.extensions import db 
 
 heroes_bp = Blueprint('heroes', __name__)
 
@@ -35,7 +35,7 @@ def create_hero():
     
     return jsonify(new_hero.to_dict()), 201
 
-@heroes_bp.route('/heroes', methods=['GET'])
+@heroes_bp.route('/', methods=['GET'])
 def get_heroes():
     """
     Retrieve details of all heroes.

@@ -1,4 +1,4 @@
-from extensions import db 
+from app.extensions import db 
 
 class Hero(db.Model):
     __tablename__ = 'heroes'  

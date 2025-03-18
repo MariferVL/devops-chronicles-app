@@ -2,16 +2,17 @@ services:
   web:
     image: devops-chronicles  
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .. 
+      dockerfile: docker/Dockerfile
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=${FLASK_ENV}
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
+      - DB_ROOT_PASS=${DB_ROOT_PASS}
     depends_on:
       - db
   db:
@@ -20,6 +21,7 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS} 
     ports:
       - "3307:3306"
     volumes:
