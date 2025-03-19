@@ -27,6 +27,13 @@
   command: /opt/venv_ansible/bin/pip install --upgrade pip
   when: ansible_os_family == "Debian"
 
+- name: Ensure setuptools is installed in the virtual environment
+  pip:
+    name: setuptools
+    virtualenv: /opt/venv_ansible
+    state: present
+  when: ansible_os_family == "Debian"
+
 - name: Ensure botocore and boto3 are installed in the virtual environment
   pip:
     name:
