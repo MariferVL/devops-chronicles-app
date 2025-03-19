@@ -4,6 +4,11 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "db_host" {
+  description = "Database host"
+  type        = string
+}
+
 variable "db_user" {
   description = "Database user"
   type        = string
@@ -15,8 +20,19 @@ variable "db_pass" {
   sensitive   = true
 }
 
+variable "db_root_pass" {
+  description = "Database root password"
+  type        = string
+  sensitive   = true
+}
+
 variable "db_name" {
   description = "Database name"
+  type        = string
+}
+
+variable "flask_env" {
+  description = "Flask environment setting (e.g., production, development, staging)"
   type        = string
 }
 
