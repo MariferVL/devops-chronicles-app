@@ -10,7 +10,7 @@ pipeline {
 	stages {
     	stage('Checkout') {
         	steps {
-            	git branch: 'feature/jenkins-pipeline', url: 'https://github.com/MariferVL/devops-chronicles-app.git'
+            	git branch: 'develop', url: 'https://github.com/MariferVL/devops-chronicles-app.git'
         	}
     	}
 
