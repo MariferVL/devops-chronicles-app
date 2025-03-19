@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        DOCKER_COMPOSE_FILE = "docker/docker-compose.yml"
         DOCKER_HUB_USER = "marifervl"
     }
     
@@ -14,11 +13,37 @@ pipeline {
             }
         }
         
+        stage('Terraform Provisioning') {
+            steps {
+                dir('terraform') {
+                    echo "Initializing and applying Terraform..."
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        
+        stage('Capture Terraform Outputs') {
+            steps {
+                dir('terraform') {
+                    script {
+                        def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim()
+                        def outputs = readJSON text: tfOutput
+
+                        env.INSTANCE_PUBLIC_IP = outputs.instance_public_ip.value
+                        env.RDS_ENDPOINT = outputs.rds_endpoint.value
+                        echo "Instance Public IP: ${env.INSTANCE_PUBLIC_IP}"
+                        echo "RDS Endpoint: ${env.RDS_ENDPOINT}"
+                    }
+                }
+            }
+        }
+        
         stage('Configure SSH Known Hosts') {
             steps {
                 sh '''
                     mkdir -p ~/.ssh
-                    ssh-keyscan -H 44.207.5.149 >> ~/.ssh/known_hosts
+                    ssh-keyscan -H ${INSTANCE_PUBLIC_IP} >> ~/.ssh/known_hosts
                 '''
             }
         }
@@ -34,7 +59,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Retrieve AWS Parameters and Prepare .env file') {
             steps {
                 withCredentials([usernamePassword(
@@ -44,7 +69,6 @@ pipeline {
                 )]) {
                     script {
                         def flaskEnv = sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim()
-                        def dbHost = sh(script: "aws ssm get-parameter --name '/devops/DB_HOST' --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbUser = sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
@@ -52,7 +76,7 @@ pipeline {
                         
                         def envContent = """
                         FLASK_ENV=${flaskEnv}
-                        DB_HOST=${dbHost}
+                        DB_HOST=${RDS_ENDPOINT}
                         DB_USER=${dbUser}
                         DB_PASS=${dbPass}
                         DB_NAME=${dbName}
@@ -66,7 +90,9 @@ pipeline {
         
         stage('Build Docker Images') {
             steps {
-                sh "docker-compose --env-file .env -f ${DOCKER_COMPOSE_FILE} build"
+                dir('docker') {
+                    sh "docker-compose --env-file ${WORKSPACE}/.env -f docker-compose.yml build"
+                }
             }
         }
         
@@ -77,16 +103,18 @@ pipeline {
         }
         
         stage('Deploy via Ansible') {
-            when { expression { fileExists('ansible/deploy.yml') } }
             steps {
-                sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
+                dir('ansible') {
+                    sh "ansible-playbook -i inventory.ini deploy.yml --extra-vars \"db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}\""
+                }
             }
         }
+
     }
     
     post {
         always {
-            sh "rm -f .env"
+            sh "rm -f ${WORKSPACE}/.env"
         }
         success {
             echo "Pipeline executed successfully."
