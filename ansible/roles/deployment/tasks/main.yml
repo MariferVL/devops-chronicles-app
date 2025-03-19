@@ -17,6 +17,14 @@
     state: started
     enabled: yes
 
+- name: Ensure botocore and boto3 are installed
+  pip:
+    name:
+      - botocore
+      - boto3
+    state: present
+  when: ansible_os_family == "Debian"
+
 - name: Deploy Application Container
   docker_container:
     name: devops_api
