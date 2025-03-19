@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        AWS_REGION = 'us-east-1'
-        DOCKER_HUB_USER = "marifervl"
-    }
-    
     stages {
         stage('Checkout') {
             steps {
@@ -96,6 +91,38 @@ pipeline {
             }
         }
         
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-credentials', 
+                    usernameVariable: 'DOCKER_USER', 
+                    passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                    echo "Logging in to Docker Hub..."
+                    sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
+                }
+                sh "docker tag marifervl/devops-chronicles:latest marifervl/devops-chronicles:${BUILD_NUMBER}"
+                sh "docker push marifervl/devops-chronicles:latest"
+                sh "docker push marifervl/devops-chronicles:${BUILD_NUMBER}"
+            }
+        }
+        
+        stage('Database Migrations') {
+            steps {
+                sh '''
+                   docker run --rm \
+                     -e FLASK_ENV=production \
+                     -e DB_HOST=${RDS_ENDPOINT} \
+                     -e DB_USER=$(aws ssm get-parameter --name "/devops/DB_USER" --query Parameter.Value --output text) \
+                     -e DB_PASS=$(aws ssm get-parameter --name "/devops/DB_PASS" --with-decryption --query Parameter.Value --output text) \
+                     -e DB_NAME=$(aws ssm get-parameter --name "/devops/DB_NAME" --query Parameter.Value --output text) \
+                     -e DB_ROOT_PASS=$(aws ssm get-parameter --name "/devops/DB_ROOT_PASS" --with-decryption --query Parameter.Value --output text) \
+                     marifervl/devops-chronicles:latest \
+                     flask db upgrade
+                '''
+            }
+        }
+        
         stage('Test') {
             steps {
                 echo "No automated tests available at the moment."
@@ -109,7 +136,6 @@ pipeline {
                 }
             }
         }
-
     }
     
     post {
