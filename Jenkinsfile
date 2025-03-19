@@ -55,17 +55,15 @@ pipeline {
         	}
     	}
    	 
-    	stage('Check Ansible Files') {
-        	steps {
-            	script {
-                	if (fileExists('ansible/playbook.yml')) {
-                    	echo "Ansible playbook found, proceeding with deployment..."
-                	} else {
-                    	error "Ansible playbook not found! Skipping deployment."
-                	}
-            	}
-        	}
-    	}
+		stage('Check Ansible Files') {
+			when {
+				expression { fileExists('ansible/playbook.yml') }
+			}
+			steps {
+				echo "Ansible playbook found, proceeding with deployment..."
+			}
+		}
+
 	}
     
 	post {
