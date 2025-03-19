@@ -3,7 +3,7 @@ FROM jenkins/jenkins:lts
 USER root
 
 RUN apt update && \
-    apt install -y docker.io unzip && \
+    apt install -y docker.io docker-compose unzip && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
