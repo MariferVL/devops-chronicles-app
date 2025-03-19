@@ -1,0 +1,6 @@
+---
+- name: Deploy DevOps Chronicles API
+  hosts: webservers
+  become: yes
+  roles:
+    - deployment
