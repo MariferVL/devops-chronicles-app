@@ -1,5 +1,23 @@
+terraform {
+  required_version = ">= 1.11.2"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.91"
+    }
+  }
+
+}
+
 provider "aws" {
   region = var.aws_region
+}
+
+resource "aws_ssm_parameter" "db_host" {
+  name  = "/devops/DB_HOST"
+  type  = "String"
+  value = var.db_host
 }
 
 resource "aws_ssm_parameter" "db_user" {
@@ -18,6 +36,18 @@ resource "aws_ssm_parameter" "db_name" {
   name  = "/devops/DB_NAME"
   type  = "String"
   value = var.db_name
+}
+
+resource "aws_ssm_parameter" "db_root_pass" {
+  name  = "/devops/DB_ROOT_PASS"
+  type  = "SecureString"
+  value = var.db_root_pass
+}
+
+resource "aws_ssm_parameter" "flask_env" {
+  name  = "/devops/FLASK_ENV"
+  type  = "String"
+  value = var.flask_env
 }
 
 resource "aws_security_group" "devops_sg" {
@@ -78,13 +108,6 @@ resource "aws_instance" "devops_instance" {
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.devops_key.key_name
   security_groups        = [aws_security_group.devops_sg.name]
-
-  user_data = templatefile("${path.module}/init.sh.tpl", {
-    db_user = var.db_user
-    db_pass = var.db_pass
-    db_name = var.db_name
-    db_host = aws_db_instance.devops_rds.address
-  })
 
   tags = {
     Name = "DevOpsChroniclesInstance"
