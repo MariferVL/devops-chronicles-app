@@ -1,19 +1,19 @@
 pipeline {
-	agent any
+    agent any
 
-	environment {
-		AWS_REGION = 'us-east-1' 
-    	DOCKER_COMPOSE_FILE = "docker/docker-compose.yml"
-    	DOCKER_HUB_USER = "marifervl"
-	}
-
-	stages {
-    	stage('Checkout') {
-        	steps {
-            	git branch: 'feature/ansible-deployment', url: 'https://github.com/MariferVL/devops-chronicles-app.git'
-        	}
-    	}
-
+    environment {
+        AWS_REGION = 'us-east-1'
+        DOCKER_COMPOSE_FILE = "docker/docker-compose.yml"
+        DOCKER_HUB_USER = "marifervl"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Retrieve AWS Parameters and Prepare .env file') {
             steps {
                 withCredentials([usernamePassword(
@@ -28,7 +28,7 @@ pipeline {
                         def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbRootPass = sh(script: "aws ssm get-parameter --name '/devops/DB_ROOT_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
-
+                        
                         def envContent = """
                         FLASK_ENV=${flaskEnv}
                         DB_HOST=${dbHost}
@@ -42,36 +42,36 @@ pipeline {
                 }
             }
         }
-
-    	stage('Build Docker Images') {
-        	steps {
-            	sh "docker-compose --env-file .env -f ${DOCKER_COMPOSE_FILE} build"
-        	}
-    	}
-   	 
-    	stage('Test') {
-        	steps {
-            	echo "No automated tests available at the moment."
-        	}
-    	}
-   	 
-		stage('Deploy via Ansible') {
-			steps {
-				sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
-			}
-		}
-
-	}
+        
+        stage('Build Docker Images') {
+            steps {
+                sh "docker-compose --env-file .env -f ${DOCKER_COMPOSE_FILE} build"
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo "No automated tests available at the moment."
+            }
+        }
+        
+        stage('Deploy via Ansible') {
+            when { expression { fileExists('ansible/deploy.yml') } }
+            steps {
+                sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
+            }
+        }
+    }
     
-	post {
-    	always {
-        	sh "rm -f .env"
-    	}
-    	success {
-        	echo "Pipeline executed successfully."
-    	}
-    	failure {
-        	echo "Pipeline execution failed. Please review the logs."
-    	}
-	}
+    post {
+        always {
+            sh "rm -f .env"
+        }
+        success {
+            echo "Pipeline executed successfully."
+        }
+        failure {
+            echo "Pipeline execution failed. Please review the logs."
+        }
+    }
 }
