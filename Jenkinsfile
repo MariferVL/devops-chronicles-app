@@ -27,6 +27,7 @@ pipeline {
                         def dbUser = sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
                         def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
+                        def dbRootPass = sh(script: "aws ssm get-parameter --name '/devops/DB_ROOT_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
 
                         def envContent = """
                         FLASK_ENV=${flaskEnv}
@@ -34,6 +35,7 @@ pipeline {
                         DB_USER=${dbUser}
                         DB_PASS=${dbPass}
                         DB_NAME=${dbName}
+                        DB_ROOT_PASS=${dbRootPass}
                         """
                         writeFile file: '.env', text: envContent
                     }
