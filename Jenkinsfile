@@ -21,26 +21,12 @@ pipeline {
                     passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                 )]) {
                     script {
-                        
-                        def awsCli = docker.image('amazon/aws-cli:latest')
-                        awsCli.pull()  
+                        def flaskEnv = sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim()
+                        def dbHost = sh(script: "aws ssm get-parameter --name '/devops/DB_HOST' --query Parameter.Value --output text", returnStdout: true).trim()
+                        def dbUser = sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
+                        def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
+                        def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
 
-                        def flaskEnv = awsCli.inside("--user root") {
-                            return sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim()
-                        }
-                        def dbHost = awsCli.inside("--user root") {
-                            return sh(script: "aws ssm get-parameter --name '/devops/DB_HOST' --query Parameter.Value --output text", returnStdout: true).trim()
-                        }
-                        def dbUser = awsCli.inside("--user root") {
-                            return sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
-                        }
-                        def dbPass = awsCli.inside("--user root") {
-                            return sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
-                        }
-                        def dbName = awsCli.inside("--user root") {
-                            return sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
-                        }
-                        
                         def envContent = """
                         FLASK_ENV=${flaskEnv}
                         DB_HOST=${dbHost}
