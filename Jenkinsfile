@@ -2,6 +2,7 @@ pipeline {
 	agent any
 
 	environment {
+		AWS_REGION = 'us-east-1' 
     	DOCKER_COMPOSE_FILE = "docker/docker-compose.yml"
     	DOCKER_HUB_USER = "marifervl"
 	}
