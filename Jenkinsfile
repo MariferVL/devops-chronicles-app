@@ -14,51 +14,45 @@ pipeline {
     	}
 
     	stage('Retrieve AWS Parameters and Prepare .env file') {
-        	steps {
-            	withCredentials([usernamePassword(
-                	credentialsId: 'aws-creds',
-                	usernameVariable: 'AWS_ACCESS_KEY_ID',
-                	passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-            	)]) {
-                	script {
-                    	def flaskEnv = sh(
-                        	script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text",
-                        	returnStdout: true
-                    	).trim()
-                   	 
-                    	def dbHost = sh(
-                        	script: "aws ssm get-parameter --name '/devops/DB_HOST' --query Parameter.Value --output text",
-                        	returnStdout: true
-                    	).trim()
-                   	 
-                    	def dbUser = sh(
-                        	script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text",
-                        	returnStdout: true
-                    	).trim()
-                   	 
-                    	def dbPass = sh(
-                        	script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text",
-                        	returnStdout: true
-                    	).trim()
-                   	 
-                    	def dbName = sh(
-                        	script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text",
-                        	returnStdout: true
-                    	).trim()
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    script {
+                        def awsCli = docker.image('amazon/aws-cli:latest')
+                        awsCli.pull()  
 
-                    	def envContent = """
-                    	FLASK_ENV=${flaskEnv}
-                    	DB_HOST=${dbHost}
-                    	DB_USER=${dbUser}
-                    	DB_PASS=${dbPass}
-                    	DB_NAME=${dbName}
-                    	"""
-                    	writeFile file: '.env', text: envContent
-                	}
-            	}
-        	}
-    	}
-   	 
+                        def flaskEnv = awsCli.inside {
+                            return sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim()
+                        }
+                        def dbHost = awsCli.inside {
+                            return sh(script: "aws ssm get-parameter --name '/devops/DB_HOST' --query Parameter.Value --output text", returnStdout: true).trim()
+                        }
+                        def dbUser = awsCli.inside {
+                            return sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
+                        }
+                        def dbPass = awsCli.inside {
+                            return sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
+                        }
+                        def dbName = awsCli.inside {
+                            return sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
+                        }
+                        
+                        def envContent = """
+                        FLASK_ENV=${flaskEnv}
+                        DB_HOST=${dbHost}
+                        DB_USER=${dbUser}
+                        DB_PASS=${dbPass}
+                        DB_NAME=${dbName}
+                        """
+                        writeFile file: '.env', text: envContent
+                    }
+                }
+            }
+        }
+
     	stage('Build Docker Images') {
         	steps {
             	sh "docker-compose --env-file .env -f ${DOCKER_COMPOSE_FILE} build"
