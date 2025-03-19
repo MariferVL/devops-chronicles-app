@@ -7,6 +7,12 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Prepare Terraform Directory') {
+            steps {
+                sh 'chmod -R u+w terraform'
+            }
+        }
         
         stage('Terraform Provisioning') {
             steps {
