@@ -53,7 +53,7 @@
       - "5000:5000"
     env:
       FLASK_ENV: "production"  
-      DB_HOST: "rds_endpoint"  
+      DB_HOST: "{{ db_host }}"  
       DB_USER: "{{ lookup('aws_ssm', '/devops/DB_USER') }}"
       DB_PASS: "{{ lookup('aws_ssm', '/devops/DB_PASS') }}"
       DB_NAME: "{{ lookup('aws_ssm', '/devops/DB_NAME') }}"
