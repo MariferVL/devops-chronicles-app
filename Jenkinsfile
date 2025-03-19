@@ -14,6 +14,15 @@ pipeline {
             }
         }
         
+        stage('Configure SSH Known Hosts') {
+            steps {
+                sh '''
+                   mkdir -p ~/.ssh
+                   ssh-keyscan -H 44.207.5.149 >> ~/.ssh/known_hosts
+                '''
+            }
+        }
+
         stage('Retrieve AWS Parameters and Prepare .env file') {
             steps {
                 withCredentials([usernamePassword(
