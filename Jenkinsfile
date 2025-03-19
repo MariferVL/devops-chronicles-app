@@ -10,14 +10,17 @@ pipeline {
         
         stage('Terraform Provisioning') {
             steps {
-                dir('terraform') {
-                    echo "Initializing and applying Terraform..."
-                    sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
+                withCredentials([file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE')]) {
+                    sh 'cp $TF_VARS_FILE terraform/terraform.tfvars'
+                    dir('terraform') {
+                        echo "Initializing and applying Terraform..."
+                        sh 'terraform init'
+                        sh 'terraform apply -auto-approve'
+                    }
                 }
             }
         }
-        
+
         stage('Capture Terraform Outputs') {
             steps {
                 dir('terraform') {
