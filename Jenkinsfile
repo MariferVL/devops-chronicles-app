@@ -10,7 +10,7 @@ pipeline {
 	stages {
     	stage('Checkout') {
         	steps {
-            	git branch: 'develop', url: 'https://github.com/MariferVL/devops-chronicles-app.git'
+            	git branch: 'feature/ansible-deployment', url: 'https://github.com/MariferVL/devops-chronicles-app.git'
         	}
     	}
 
@@ -55,12 +55,9 @@ pipeline {
         	}
     	}
    	 
-		stage('Check Ansible Files') {
-			when {
-				expression { fileExists('ansible/playbook.yml') }
-			}
+		stage('Deploy via Ansible') {
 			steps {
-				echo "Ansible playbook found, proceeding with deployment..."
+				sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
 			}
 		}
 
