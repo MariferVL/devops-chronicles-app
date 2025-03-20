@@ -142,6 +142,19 @@ pipeline {
             }
         }
         
+        stage('Prepare Ansible Inventory') {
+            steps {
+                dir('ansible') {
+                    script {
+                        sh '''
+                        sed -i "s/<INSTANCE_PUBLIC_IP>/${INSTANCE_PUBLIC_IP}/g" inventory.ini
+                        sed -i "s/<RDS_ENDPOINT>/${RDS_ENDPOINT}/g" inventory.ini
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Deploy via Ansible') {
             steps {
                 dir('ansible') {
