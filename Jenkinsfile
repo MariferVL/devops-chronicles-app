@@ -8,6 +8,14 @@ pipeline {
             }
         }
 
+                stage('Debug SSH Public Key') {
+            steps {
+                withCredentials([file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')]) {
+                    sh 'head -n 1 $SSH_PUB_KEY'
+                }
+            }
+        }
+
         stage('Prepare Terraform Directory') {
             steps {
                 sh 'chmod -R u+w terraform'
