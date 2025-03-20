@@ -64,7 +64,7 @@ pipeline {
         stage('Configure SSH Key') {
             steps {
 
-                withCredentials([file(credentialsId: 'devops-key-cred', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([file(credentialsId: 'devops-key-cred', variable: 'SSH_KEY')]) {
                     sh '''
                         mkdir -p ~/.ssh
                         cp $SSH_KEY ~/.ssh/devops-key
