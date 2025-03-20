@@ -21,7 +21,8 @@ pipeline {
                 ]) {
                     echo "Debugging Terraform Apply command..."
                     sh "echo 'Passed pub_key_content:'"
-                    sh "echo \"$(cat $SSH_PUB_KEY)\""
+                    sh "cat ${SSH_PUB_KEY}"
+
                     sh "terraform init"
                     sh "terraform plan -var 'pub_key_content=$(cat $SSH_PUB_KEY)'"
                     sh "terraform apply -auto-approve -var 'pub_key_content=$(cat $SSH_PUB_KEY)'"
