@@ -14,47 +14,23 @@ pipeline {
             }
         }
         
-        stage('Debug Terraform Apply') {
-            steps {
-                script {
-                    withCredentials([
-                        file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')
-                    ]) {
-                        echo "Debugging Terraform Apply command..."
-
-                        sh """
-                            echo 'Passed pub_key_content:'
-                            cat $SSH_PUB_KEY
-                        """
-
-                        dir('terraform') {
-                            sh 'terraform init'
-                            
-                            sh """
-                                terraform plan -var "pub_key_content=\$(cat $SSH_PUB_KEY)"
-                            """
-
-                            sh """
-                                terraform apply -auto-approve -var "pub_key_content=\$(cat $SSH_PUB_KEY)"
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Terraform Provisioning') {
             steps {
                 withCredentials([
                     file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE'),
-                    file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY'),
+                    file(credentialsId: 'devops-key-pub-cred', variable: 'SSH_PUB_KEY'),
                     usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     sh 'cp $TF_VARS_FILE terraform/terraform.tfvars'
                     dir('terraform') {
                         echo "Initializing and applying Terraform..."
                         sh 'terraform init'
-                        sh "terraform apply -auto-approve -var 'pub_key_content=${SSH_PUB_KEY}'"
+                        sh '''
+                            terraform plan -var "pub_key_content=$(cat $SSH_PUB_KEY)"
+                        '''
+                        sh '''
+                            terraform apply -auto-approve -var "pub_key_content=$(cat $SSH_PUB_KEY)"
+                        '''
                     }
                 }
             }
@@ -64,8 +40,8 @@ pipeline {
             steps {
                 dir('terraform') {
                     script {
-                        def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim()
-                        def outputs = readJSON text: tfOutput
+                        def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim();
+                        def outputs = readJSON(text: tfOutput);
 
                         env.INSTANCE_PUBLIC_IP = outputs.instance_public_ip.value
                         env.RDS_ENDPOINT = outputs.rds_endpoint.value
@@ -106,20 +82,21 @@ pipeline {
                     passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                 )]) {
                     script {
-                        def flaskEnv = sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim()
-                        def dbUser = sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim()
-                        def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
-                        def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim()
-                        def dbRootPass = sh(script: "aws ssm get-parameter --name '/devops/DB_ROOT_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim()
+                        def flaskEnv = sh(script: "aws ssm get-parameter --name '/devops/FLASK_ENV' --query Parameter.Value --output text", returnStdout: true).trim();
+                        def dbUser = sh(script: "aws ssm get-parameter --name '/devops/DB_USER' --query Parameter.Value --output text", returnStdout: true).trim();
+                        def dbPass = sh(script: "aws ssm get-parameter --name '/devops/DB_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim();
+                        def dbName = sh(script: "aws ssm get-parameter --name '/devops/DB_NAME' --query Parameter.Value --output text", returnStdout: true).trim();
+                        def dbRootPass = sh(script: "aws ssm get-parameter --name '/devops/DB_ROOT_PASS' --with-decryption --query Parameter.Value --output text", returnStdout: true).trim();
                         
                         def envContent = """
-                        FLASK_ENV=${flaskEnv}
-                        DB_HOST=${RDS_ENDPOINT}
-                        DB_USER=${dbUser}
-                        DB_PASS=${dbPass}
-                        DB_NAME=${dbName}
-                        DB_ROOT_PASS=${dbRootPass}
-                        """
+                            FLASK_ENV=${flaskEnv}
+                            DB_HOST=${env.RDS_ENDPOINT}
+                            DB_USER=${dbUser}
+                            DB_PASS=${dbPass}
+                            DB_NAME=${dbName}
+                            DB_ROOT_PASS=${dbRootPass}
+                            """.stripIndent().trim();
+
                         writeFile file: '.env', text: envContent
                     }
                 }
@@ -153,15 +130,8 @@ pipeline {
         stage('Database Migrations') {
             steps {
                 sh '''
-                   docker run --rm \
-                     -e FLASK_ENV=production \
-                     -e DB_HOST=${RDS_ENDPOINT} \
-                     -e DB_USER=$(aws ssm get-parameter --name "/devops/DB_USER" --query Parameter.Value --output text) \
-                     -e DB_PASS=$(aws ssm get-parameter --name "/devops/DB_PASS" --with-decryption --query Parameter.Value --output text) \
-                     -e DB_NAME=$(aws ssm get-parameter --name "/devops/DB_NAME" --query Parameter.Value --output text) \
-                     -e DB_ROOT_PASS=$(aws ssm get-parameter --name "/devops/DB_ROOT_PASS" --with-decryption --query Parameter.Value --output text) \
-                     marifervl/devops-chronicles:latest \
-                     flask db upgrade
+                   docker run --rm --env-file .env marifervl/devops-chronicles:latest 
+                   flask db upgrade
                 '''
             }
         }
