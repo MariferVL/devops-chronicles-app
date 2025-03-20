@@ -29,12 +29,14 @@ pipeline {
                     dir('terraform') {
                         echo "Initializing and applying Terraform..."
                         sh 'terraform init'
-                        sh '''
+                        sh(script: '''
+                            set +x
                             terraform plan -var "pub_key_content=$(cat $SSH_PUB_KEY)"
-                        '''
-                        sh '''
+                        ''', returnStdout: true)
+                        sh(script: '''
+                            set +x
                             terraform apply -auto-approve -var "pub_key_content=$(cat $SSH_PUB_KEY)"
-                        '''
+                        ''', returnStdout: true)
                     }
                 }
             }
@@ -123,7 +125,9 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     echo "Logging in to Docker Hub..."
-                    sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u ${DOCKER_USER} --password-stdin
+                        '''
                 }
                 sh "docker tag marifervl/devops-chronicles:latest marifervl/devops-chronicles:${BUILD_NUMBER}"
                 sh "docker push marifervl/devops-chronicles:latest"
@@ -131,14 +135,6 @@ pipeline {
             }
         }
         
-        stage('Database Migrations') {
-            steps {
-                sh '''
-                   docker run --rm --env-file .env marifervl/devops-chronicles:latest 
-                   flask db upgrade
-                '''
-            }
-        }
         
         stage('Test') {
             steps {
