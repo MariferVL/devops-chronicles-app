@@ -100,7 +100,7 @@ resource "aws_db_instance" "devops_rds" {
 
 resource "aws_key_pair" "devops_key" {
   key_name   = "devops-key"
-  public_key = file(var.pub_key)
+  public_key = var.pub_key_content
 }
 
 resource "aws_instance" "devops_instance" {

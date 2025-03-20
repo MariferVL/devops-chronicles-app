@@ -18,13 +18,13 @@ pipeline {
             steps {
                 withCredentials([
                     file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE'),
-                    usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
+                    file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')
                 ]) {
                     sh 'cp $TF_VARS_FILE terraform/terraform.tfvars'
                     dir('terraform') {
                         echo "Initializing and applying Terraform..."
-                        sh 'terraform init'
-                        sh 'terraform apply -auto-approve'
+                        sh "terraform init"
+                        sh "terraform apply -auto-approve -var 'pub_key_content=${SSH_PUB_KEY}'"
                     }
                 }
             }

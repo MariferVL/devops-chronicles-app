@@ -41,7 +41,7 @@ variable "rds_allocated_storage" {
   type        = number
 }
 
-variable "pub_key" {
-  description = "Path to the public key file"
+variable "pub_key_content" {
+  description = "The content of the public SSH key"
   type        = string
 }
