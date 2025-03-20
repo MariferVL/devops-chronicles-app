@@ -16,7 +16,10 @@ pipeline {
         
         stage('Terraform Provisioning') {
             steps {
-                withCredentials([file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE')]) {
+                withCredentials([
+                    file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE'),
+                    usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     sh 'cp $TF_VARS_FILE terraform/terraform.tfvars'
                     dir('terraform') {
                         echo "Initializing and applying Terraform..."
