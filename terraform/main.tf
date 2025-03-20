@@ -18,36 +18,42 @@ resource "aws_ssm_parameter" "db_host" {
   name  = "/devops/DB_HOST"
   type  = "String"
   value = var.db_host
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_user" {
   name  = "/devops/DB_USER"
   type  = "String"
   value = var.db_user
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_pass" {
   name  = "/devops/DB_PASS"
   type  = "SecureString"
   value = var.db_pass
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_name" {
   name  = "/devops/DB_NAME"
   type  = "String"
   value = var.db_name
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_root_pass" {
   name  = "/devops/DB_ROOT_PASS"
   type  = "SecureString"
   value = var.db_root_pass
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "flask_env" {
   name  = "/devops/FLASK_ENV"
   type  = "String"
   value = var.flask_env
+  overwrite = true
 }
 
 resource "aws_security_group" "devops_sg" {
