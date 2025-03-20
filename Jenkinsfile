@@ -8,20 +8,27 @@ pipeline {
             }
         }
 
-                stage('Debug SSH Public Key') {
-            steps {
-                withCredentials([file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')]) {
-                    sh 'head -n 1 $SSH_PUB_KEY'
-                }
-            }
-        }
-
         stage('Prepare Terraform Directory') {
             steps {
                 sh 'chmod -R u+w terraform'
             }
         }
         
+        stage('Debug Terraform Apply') {
+            steps {
+                withCredentials([
+                    file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')
+                ]) {
+                    echo "Debugging Terraform Apply command..."
+                    sh "echo 'Passed pub_key_content:'"
+                    sh "echo \"$(cat $SSH_PUB_KEY)\""
+                    sh "terraform init"
+                    sh "terraform plan -var 'pub_key_content=$(cat $SSH_PUB_KEY)'"
+                    sh "terraform apply -auto-approve -var 'pub_key_content=$(cat $SSH_PUB_KEY)'"
+                }
+            }
+        }
+
         stage('Terraform Provisioning') {
             steps {
                 withCredentials([
