@@ -18,12 +18,13 @@ pipeline {
             steps {
                 withCredentials([
                     file(credentialsId: 'tfvars-file', variable: 'TF_VARS_FILE'),
-                    file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY')
+                    file(credentialsId: 'devops-key-cred', variable: 'SSH_PUB_KEY'),
+                    usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     sh 'cp $TF_VARS_FILE terraform/terraform.tfvars'
                     dir('terraform') {
                         echo "Initializing and applying Terraform..."
-                        sh "terraform init"
+                        sh 'terraform init'
                         sh "terraform apply -auto-approve -var 'pub_key_content=${SSH_PUB_KEY}'"
                     }
                 }
@@ -57,6 +58,7 @@ pipeline {
         
         stage('Configure SSH Key') {
             steps {
+
                 withCredentials([file(credentialsId: 'devops-key-cred', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         mkdir -p ~/.ssh
@@ -109,7 +111,7 @@ pipeline {
                     credentialsId: 'docker-hub-credentials', 
                     usernameVariable: 'DOCKER_USER', 
                     passwordVariable: 'DOCKER_PASS'
-                    )]) {
+                )]) {
                     echo "Logging in to Docker Hub..."
                     sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
                 }
