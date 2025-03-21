@@ -1,21 +1,12 @@
----
 - name: Bootstrap Environment
   hosts: webservers
-  become: yes
   gather_facts: yes
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
   roles:
     - bootstrap
 
 - name: Deploy Application Container
   hosts: webservers
-  become: yes
-  become_flags: '-H -E'
   gather_facts: yes
-  vars:
-    ansible_python_interpreter: /opt/venv_ansible/bin/python3
-    ansible_ssh_common_args: '-o ControlMaster=no'
   environment:
     PATH: "/opt/venv_ansible/bin:{{ ansible_env.PATH }}"
   roles:

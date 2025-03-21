@@ -16,35 +16,3 @@
     name: docker
     state: started
     enabled: yes
-
-- name: Install python3-venv
-  become: yes
-  apt:
-    name: python3.12-venv
-    state: present
-
-- name: Create Python virtual environment with copies
-  command: python3 -m venv --copies /opt/venv_ansible
-  args:
-    creates: /opt/venv_ansible/bin/activate
-  when: ansible_os_family == "Debian"
-
-- name: Upgrade pip in virtual environment
-  command: /opt/venv_ansible/bin/pip install --upgrade pip
-  when: ansible_os_family == "Debian"
-
-- name: Ensure setuptools is installed in the virtual environment
-  pip:
-    name: setuptools
-    virtualenv: /opt/venv_ansible
-    state: present
-  when: ansible_os_family == "Debian"
-
-- name: Ensure botocore and boto3 are installed in the virtual environment
-  pip:
-    name:
-      - botocore
-      - boto3
-    virtualenv: /opt/venv_ansible
-    state: present
-  when: ansible_os_family == "Debian"
