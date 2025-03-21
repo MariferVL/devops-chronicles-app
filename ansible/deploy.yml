@@ -10,11 +10,15 @@
 - name: Deploy Application Container
   hosts: webservers
   become: yes
+  gather_facts: false                          
   vars:
     ansible_python_interpreter: /opt/venv_ansible/bin/python3
   tasks:
     - name: Reset connection to use new Python interpreter
       meta: reset_connection
+
+    - name: Gather facts with new interpreter
+      setup:                                  
 
     - name: Include deploy role
       include_role:
