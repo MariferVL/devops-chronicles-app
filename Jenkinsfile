@@ -159,14 +159,13 @@ pipeline {
             steps {
                 dir('ansible') {
                     sh '''
-                        if [ ! -d "${WORKSPACE}/venv_ansible" ]; then
-                            python3 -m venv ${WORKSPACE}/venv_ansible
+                        if [ ! -f "${WORKSPACE}/venv_ansible/bin/activate" ]; then
+                            rm -rf "${WORKSPACE}/venv_ansible"
+                            python3 -m venv --upgrade-deps "${WORKSPACE}/venv_ansible"
                         fi
 
-                        . ${WORKSPACE}/venv_ansible/bin/activate
-                
+                        . "${WORKSPACE}/venv_ansible/bin/activate"
                         pip install botocore boto3
-                        
                         ansible-playbook -i inventory.ini deploy.yml --extra-vars "db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}"
                     '''
                 }
