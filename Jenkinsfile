@@ -163,7 +163,7 @@ pipeline {
                             python3 -m venv ${WORKSPACE}/venv_ansible
                         fi
 
-                        source ${WORKSPACE}/venv_ansible/bin/activate
+                        . ${WORKSPACE}/venv_ansible/bin/activate
                 
                         pip install botocore boto3
                         
