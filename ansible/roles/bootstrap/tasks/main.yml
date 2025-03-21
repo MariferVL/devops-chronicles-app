@@ -29,7 +29,6 @@
     creates: /opt/venv_ansible/bin/activate
   when: ansible_os_family == "Debian"
 
-
 - name: Upgrade pip in virtual environment
   command: /opt/venv_ansible/bin/pip install --upgrade pip
   when: ansible_os_family == "Debian"
