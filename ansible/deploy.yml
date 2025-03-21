@@ -11,7 +11,7 @@
 - name: Deploy Application Container
   hosts: webservers
   become: yes
-  become_flags: '-E'
+  become_flags: '-H -E'
   gather_facts: yes
   vars:
     ansible_python_interpreter: /opt/venv_ansible/bin/python3
