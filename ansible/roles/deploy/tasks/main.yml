@@ -1,3 +1,17 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# tasks file for deploy
+- name: Deploy Application Container
+  docker_container:
+    name: devops_api
+    image: "marifervl/devops-chronicles:latest"
+    state: started
+    restart_policy: always
+    published_ports:
+      - "5000:5000"
+    env:
+      FLASK_ENV: "production"
+      DB_HOST: "{{ db_host }}"
+      DB_USER: "{{ lookup('aws_ssm', '/devops/DB_USER') }}"
+      DB_PASS: "{{ lookup('aws_ssm', '/devops/DB_PASS') }}"
+      DB_NAME: "{{ lookup('aws_ssm', '/devops/DB_NAME') }}"
+      DB_ROOT_PASS: "{{ lookup('aws_ssm', '/devops/DB_ROOT_PASS') }}"
