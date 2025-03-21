@@ -171,12 +171,15 @@ pipeline {
                         fi
 
                         . "${WORKSPACE}/venv_ansible/bin/activate"
-                        pip install botocore boto3
-                        ansible-playbook -i inventory.ini deploy.yml --extra-vars "db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}"
+                        
+                        pip install botocore boto3 ansible
+
+                        ${WORKSPACE}/venv_ansible/bin/ansible-playbook -i inventory.ini deploy.yml --extra-vars "db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}"
                     '''
                 }
             }
-        }
+}
+
     }
     
     post {
