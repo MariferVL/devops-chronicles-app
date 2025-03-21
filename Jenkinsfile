@@ -163,23 +163,27 @@ pipeline {
 
         stage('Deploy via Ansible') {
             steps {
-                dir('ansible') {
-                    sh '''
-                        if [ ! -f "${WORKSPACE}/venv_ansible/bin/activate" ]; then
-                            rm -rf "${WORKSPACE}/venv_ansible"
-                            python3 -m venv --upgrade-deps "${WORKSPACE}/venv_ansible"
-                        fi
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {                                              
+                    dir('ansible') {
+                        sh '''
+                            if [ ! -f "${WORKSPACE}/venv_ansible/bin/activate" ]; then
+                                rm -rf "${WORKSPACE}/venv_ansible"
+                                python3 -m venv --upgrade-deps "${WORKSPACE}/venv_ansible"
+                            fi
 
-                        . "${WORKSPACE}/venv_ansible/bin/activate"
-                        
-                        pip install botocore boto3 ansible
+                            . "${WORKSPACE}/venv_ansible/bin/activate"
+                            pip install botocore boto3 ansible
 
-                        ${WORKSPACE}/venv_ansible/bin/ansible-playbook -i inventory.ini deploy.yml --extra-vars "db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}"
-                    '''
+                            ${WORKSPACE}/venv_ansible/bin/ansible-playbook -i inventory.ini deploy.yml --extra-vars "db_host=${RDS_ENDPOINT} instance_ip=${INSTANCE_PUBLIC_IP}"
+                        '''
+                    }
                 }
             }
-}
-
+        }
     }
     
     post {
