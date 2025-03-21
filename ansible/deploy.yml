@@ -1,6 +1,21 @@
 ---
-- name: Deploy DevOps Chronicles API
+- name: Bootstrap Environment
   hosts: webservers
   become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   roles:
-    - deployment
+    - bootstrap
+
+- name: Deploy Application Container
+  hosts: webservers
+  become: yes
+  vars:
+    ansible_python_interpreter: /opt/venv_ansible/bin/python3
+  tasks:
+    - name: Reset connection to use new Python interpreter
+      meta: reset_connection
+
+    - name: Include deploy role
+      include_role:
+        name: deploy
