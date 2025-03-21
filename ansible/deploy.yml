@@ -1,12 +1,14 @@
 - name: Bootstrap Environment
   hosts: webservers
   gather_facts: yes
+  become: yes
   roles:
     - bootstrap
 
 - name: Deploy Application Container
   hosts: webservers
   gather_facts: yes
+  become: yes
   environment:
     PATH: "/opt/venv_ansible/bin:{{ ansible_env.PATH }}"
   roles:
