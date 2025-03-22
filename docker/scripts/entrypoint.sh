@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "Waiting for database to be ready..."
+/app/scripts/wait-for-it.sh db:3306 -s -t 30
+
 echo "Running database migrations..."
 flask db upgrade
 
