@@ -1,4 +1,5 @@
-docker/
+.docker/
+docker-compose.override.yml
 terraform/
 __pycache__
 *.pyc
