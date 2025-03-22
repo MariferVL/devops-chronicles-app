@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, directory='app/migrations')
 
 # swagger = Swagger(app, template_file='swagger.yml')
 
