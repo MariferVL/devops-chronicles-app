@@ -108,11 +108,19 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Clean Volumes') {
+            steps {
+                dir('docker') {
+                    sh "docker-compose --env-file ${WORKSPACE}/.env down --volumes"
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 dir('docker') {
-                    sh "docker-compose --env-file ${WORKSPACE}/.env -f docker-compose.yml build"
+                    sh "docker-compose --env-file ${WORKSPACE}/.env build"
                 }
             }
         }
