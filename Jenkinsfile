@@ -164,12 +164,6 @@ pipeline {
             }
         }
 
-        stage('Debug Workspace') {
-            steps {
-                sh 'echo "WORKSPACE is: $WORKSPACE"'
-            }
-        }
-
         stage('Deploy via Ansible') {
             steps {
                 withCredentials([usernamePassword(
