@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from flasgger import Swagger
+# from flasgger import Swagger
 from dotenv import load_dotenv
 from app.extensions import db
 from app.heroes.routes import heroes_bp
@@ -18,7 +18,7 @@ db.init_app(app)
 
 migrate = Migrate(app, db)
 
-swagger = Swagger(app, template_file='swagger.yml')
+# swagger = Swagger(app, template_file='swagger.yml')
 
 app.register_blueprint(heroes_bp, url_prefix='/heroes')
 app.register_blueprint(adventures_bp, url_prefix='/adventures')
