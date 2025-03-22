@@ -1,6 +1,6 @@
 services:
   web:
-    image: devops-chronicles  
+    image: ${DOCKER_HUB_USER}/devops-chronicles:latest  
     build:
       context: .. 
       dockerfile: docker/Dockerfile

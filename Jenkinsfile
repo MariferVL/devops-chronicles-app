@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
+        DOCKER_HUB_USER = 'marifervl'
     }
 
     stages {
@@ -137,9 +138,9 @@ pipeline {
                         echo "$DOCKER_PASS" | docker login -u ${DOCKER_USER} --password-stdin
                         '''
                 }
-                sh "docker tag marifervl/devops-chronicles:latest marifervl/devops-chronicles:${BUILD_NUMBER}"
-                sh "docker push marifervl/devops-chronicles:latest"
-                sh "docker push marifervl/devops-chronicles:${BUILD_NUMBER}"
+                sh "docker tag ${DOCKER_HUB_USER}/devops-chronicles:latest ${DOCKER_HUB_USER}/devops-chronicles:${BUILD_NUMBER}"
+                sh "docker push ${DOCKER_HUB_USER}/devops-chronicles:latest"
+                sh "docker push ${DOCKER_HUB_USER}/devops-chronicles:${BUILD_NUMBER}"
             }
         }
         
