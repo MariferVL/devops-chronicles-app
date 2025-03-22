@@ -1,0 +1,3 @@
+---
+app_port: 5000
+db_host: "default_rds_endpoint"
