@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DevOps Chronicles - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="DevOps Chronicles - Welcome">
+  <meta property="og:description" content="Embark on your epic quest! In this realm, you will forge legendary DevOps heroes and venture into thrilling quests that challenge the might of automation and bring order to digital chaos.">
+  <meta property="og:image" content="{{ url_for('static', filename='img/devops_logo.png', _external=True) }}">
+  <meta property="og:url" content="{{ request.url_root }}">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DevOps Chronicles - Welcome">
+  <meta name="twitter:description" content="Embark on your epic quest! Forge legendary DevOps heroes and challenge digital chaos.">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>DevOps Chronicles</h1>
+      <p>Embark on your epic quest!</p>
+    </header>
+
+    <section class="info">
+      <p>
+        In this realm, you will forge legendary DevOps heroes and venture into thrilling quests that challenge
+        the might of automation and bring order to digital chaos.
+      </p>
+    </section>
+
+    <section class="endpoints">
+      <h2>API Endpoints</h2>
+      <ul>
+        <li><span>POST</span> /heroes/ - Create a new DevOps hero</li>
+        <li><span>GET</span> /heroes/ - Retrieve all heroes</li>
+        <li><span>GET</span> /heroes/&lt;hero_id&gt; - Retrieve hero details</li>
+        <li><span>PUT</span> /heroes/&lt;hero_id&gt; - Update hero attributes</li>
+        <li><span>DELETE</span> /heroes/&lt;hero_id&gt; - Delete a DevOps hero</li>
+        <li><span>POST</span> /adventures/ - Initiate a new adventure challenge</li>
+        <li><span>GET</span> /adventures/&lt;adventure_id&gt; - View adventure details</li>
+        <li><span>GET</span> /adventures/history - See the log of all adventures</li>
+      </ul>
+    </section>
+
+    <footer class="footer">
+      <a href="https://app.swaggerhub.com/apis/MARIFERVLDEV/dev-ops_chronicles_api/1.0.0" target="_blank" class="swagger-link">Press Start</a>
+    </footer>
+  </div>
+</body>
+</html>

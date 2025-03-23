@@ -1,0 +1,122 @@
+:root {
+  --bg-primary: #0d1217;            
+  --bg-secondary: #1b2939;         
+  --container-bg: rgba(15, 20, 27, 0.9);  
+  --accent-primary: #c2e000;  
+  --accent-secondary: #e07a5f; 
+  --text-color: #f4f4f4;
+  --header-font: 'Press Start 2P', cursive;
+  --body-font: 'Roboto', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  font-family: var(--body-font);
+  color: var(--text-color);
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--container-bg);
+  padding: 40px;
+  border: 2px solid var(--accent-primary);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-family: var(--header-font);
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--accent-primary);
+}
+
+.header p {
+  font-size: 1.2rem;
+  color: var(--accent-primary);
+  margin-bottom: 20px;
+}
+
+.info p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  padding: 0 10px;
+}
+
+.endpoints {
+  text-align: left;
+  margin: 30px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.endpoints h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.endpoints ul {
+  list-style: none;
+}
+
+.endpoints li {
+  font-size: 1.1rem;
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.endpoints li span {
+  font-weight: bold;
+  color: var(--accent-primary);
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+.swagger-link {
+  text-decoration: none;
+  font-family: var(--header-font);
+  font-size: 1.1rem;
+  color: var(--bg-primary);
+  background: var(--accent-primary);
+  border: 2px solid var(--accent-secondary);
+  padding: 12px 24px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 0 var(--accent-secondary);
+  transition: transform 0.1s ease;
+}
+
+.swagger-link:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.swagger-link:hover {
+  background: var(--accent-secondary);
+}
