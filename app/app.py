@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 # from flasgger import Swagger
 from dotenv import load_dotenv
 from app.extensions import db
@@ -28,20 +28,7 @@ def welcome():
     """
     Welcome endpoint for "DevOps Chronicles".
     """
-    return """
-    <h1>Welcome to The DevOps Chronicles</h1>
-    <p>Your journey in automating chaos and bringing order to the digital realm begins now!</p>
-    <ul>
-      <li>POST /hero/ - Create a new DevOps hero</li>
-      <li>GET /hero/&lt;hero_id&gt; - Retrieve hero details</li>
-      <li>PUT /hero/&lt;hero_id&gt; - Update hero attributes</li>
-      <li>DELETE /hero/&lt;hero_id&gt; - Delete a DevOps hero</li>
-      <li>POST /adventure/ - Initiate a new adventure challenge</li>
-      <li>GET /adventure/&lt;adventure_id&gt; - View adventure details</li>
-      <li>GET /adventure/history - See the log of all adventures</li>
-    </ul>
-    """
-
+    return render_template('index.html')
 
 if __name__ == '__main__':
     if os.getenv('FLASK_ENV') == 'development':
@@ -49,7 +36,9 @@ if __name__ == '__main__':
             from app.heroes.models import Hero  
             from app.adventures.models import Adventure 
             db.create_all()
-    # For development, run with debug=True.
+    # For development, run with debug=True:
+    #   python -m app.app
+
     # In production, run with Gunicorn (example):
-    #   gunicorn app:app --workers 4
+    #   gunicorn app.app:app --workers 4
     app.run(debug=True)
