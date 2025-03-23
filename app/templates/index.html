@@ -5,6 +5,20 @@
   <title>DevOps Chronicles - Welcome</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="DevOps Chronicles - Welcome">
+  <meta property="og:description" content="Embark on your epic quest! In this realm, you will forge legendary DevOps heroes and venture into thrilling quests that challenge the might of automation and bring order to digital chaos.">
+  <meta property="og:image" content="{{ url_for('static', filename='img/devops_logo.png', _external=True) }}">
+  <meta property="og:url" content="{{ request.url_root }}">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DevOps Chronicles - Welcome">
+  <meta name="twitter:description" content="Embark on your epic quest! Forge legendary DevOps heroes and challenge digital chaos.">
 </head>
 <body>
   <div class="container">
