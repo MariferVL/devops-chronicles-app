@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DevOps Chronicles - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>DevOps Chronicles</h1>
+      <p>Embark on your epic quest!</p>
+    </header>
+
+    <section class="info">
+      <p>
+        In this realm, you will forge legendary DevOps heroes and venture into thrilling quests that challenge
+        the might of automation and bring order to digital chaos.
+      </p>
+    </section>
+
+    <section class="endpoints">
+      <h2>API Endpoints</h2>
+      <ul>
+        <li><span>POST</span> /heroes/ - Create a new DevOps hero</li>
+        <li><span>GET</span> /heroes/ - Retrieve all heroes</li>
+        <li><span>GET</span> /heroes/&lt;hero_id&gt; - Retrieve hero details</li>
+        <li><span>PUT</span> /heroes/&lt;hero_id&gt; - Update hero attributes</li>
+        <li><span>DELETE</span> /heroes/&lt;hero_id&gt; - Delete a DevOps hero</li>
+        <li><span>POST</span> /adventures/ - Initiate a new adventure challenge</li>
+        <li><span>GET</span> /adventures/&lt;adventure_id&gt; - View adventure details</li>
+        <li><span>GET</span> /adventures/history - See the log of all adventures</li>
+      </ul>
+    </section>
+
+    <footer class="footer">
+      <a href="https://app.swaggerhub.com/apis-docs/MARIFERVLDEV/dev-ops_chronicles_api/1.0.0" target="_blank" class="swagger-link">Press Start</a>
+    </footer>
+  </div>
+</body>
+</html>
